@@ -281,27 +281,28 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ── סריקה אוטומטית כל X שעות ────────────────────────────
 async def auto_scan_job(context: ContextTypes.DEFAULT_TYPE):
     await run_scan(context.bot)
-
-
-# ── הרצה ─────────────────────────────────────────────────
 def main():
-    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app = (
+        Application.builder()
+        .token(TELEGRAM_TOKEN)
+        .build()
+    )
 
-    # handlers
     app.add_handler(CommandHandler("start",  cmd_start))
     app.add_handler(CommandHandler("scan",   cmd_scan))
     app.add_handler(CommandHandler("top",    cmd_top))
     app.add_handler(CommandHandler("status", cmd_status))
 
-    # סריקה אוטומטית
+    # סריקה אוטומטית כל שעה
     app.job_queue.run_repeating(
         auto_scan_job,
-        interval=SCAN_INTERVAL_HRS * 3600,
-        first=60,  # סריקה ראשונה אחרי דקה
+        interval=3600,
+        first=60,
     )
 
     print("🚀 Djmere Scanner Bot מופעל!")
-    app.run_polling()
+    import asyncio
+    asyncio.run(app.run_polling())
 
 
 if __name__ == "__main__":

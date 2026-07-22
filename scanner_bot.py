@@ -77,9 +77,12 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             f"O:{c[1]} H:{c[2]} L:{c[3]} C:{c[4]} V:{c[5]}"
             for c in candles[:15] if len(c) >= 6
         )
-prompt = f"""אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%
-1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}
-החזר אך ורק JSON תקני (valid JSON), בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך הטקסט של reason:
+prompt = (
+            f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
+            f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
+            "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
+            '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
+        )
 {{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה במשפט אחד בלי גרשיים"}}"""
 {{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה במשפט אחד בלי גרשיים"}}"""
     try:

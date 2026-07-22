@@ -43,7 +43,7 @@ def get_top_gainers() -> list:
             symbol = item["symbol"]
             if not symbol.endswith("USDT") or symbol in SKIP_SYMBOLS:
                 continue
-          try:
+    try:
             change_pct = float(item.get("price24hPcnt", 0)) * 100
             volume     = float(item.get("turnover24h", 0))
             price      = float(item.get("lastPrice", 0))
@@ -55,8 +55,6 @@ def get_top_gainers() -> list:
                        "change_pct": round(change_pct, 2), "volume": volume})
     coins.sort(key=lambda x: x["change_pct"], reverse=True)
     return coins[:TOP_N]
-        coins.sort(key=lambda x: x["change_pct"], reverse=True)
-        return coins[:TOP_N]
     except Exception as e:
         logger.error(f"Error: {e}")
         return []

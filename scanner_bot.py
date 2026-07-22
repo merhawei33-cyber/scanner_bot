@@ -80,8 +80,13 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
     prompt = (
         f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
         f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
-        "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
-        '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
+        "ענה בדיוק בפורמט הזה, שורה לכל שדה, בלי שום דבר נוסף:\n"
+        "DIRECTION: LONG או SHORT או SKIP\n"
+        "CONFIDENCE: מספר בין 0 ל-100\n"
+        "ENTRY: מחיר\n"
+        "SL: מחיר\n"
+        "TP: מחיר\n"
+        "REASON: משפט קצר אחד"
     )
     try:
         resp = requests.post(
@@ -93,12 +98,23 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             timeout=30,
         )
         text = resp.json()["content"][0]["text"].strip()
-        text = text.replace("```json", "").replace("```", "").strip()
-        start = text.find("{")
-        end = text.rfind("}")
-        if start != -1 and end != -1:
-            text = text[start:end+1]
-        return json.loads(text)
+        result = {"direction": "SKIP", "confidence": 0}
+        for line in text.split("\n"):
+            line = line.strip()
+            if line.upper().startswith("DIRECTION:"):
+                result["direction"] = line.split(":", 1)[1].strip().upper()
+            elif line.upper().startswith("CONFIDENCE:"):
+                digits = "".join(c for c in line.split(":", 1)[1] if c.isdigit())
+                result["confidence"] = int(digits) if digits else 0
+            elif line.upper().startswith("ENTRY:"):
+                result["entry"] = line.split(":", 1)[1].strip()
+            elif line.upper().startswith("SL:"):
+                result["sl"] = line.split(":", 1)[1].strip()
+            elif line.upper().startswith("TP:"):
+                result["tp"] = line.split(":", 1)[1].strip()
+            elif line.upper().startswith("REASON:"):
+                result["reason"] = line.split(":", 1)[1].strip()
+        return result
     except Exception as e:
         logger.error(f"Claude error {symbol}: {e}")
         return {"direction": "SKIP", "confidence": 0}

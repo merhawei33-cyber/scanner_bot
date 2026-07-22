@@ -154,7 +154,7 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def auto_scan_job(context: ContextTypes.DEFAULT_TYPE):
     await run_scan(context.bot)
 
-def main():
+def main(): 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start",  cmd_start))
     app.add_handler(CommandHandler("scan",   cmd_scan))

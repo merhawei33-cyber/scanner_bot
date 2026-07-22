@@ -92,17 +92,16 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
                   "messages": [{"role": "user", "content": prompt}]},
             timeout=30,
         )
-     text = resp.json()["content"][0]["text"].strip()
+        text = resp.json()["content"][0]["text"].strip()
         text = text.replace("```json", "").replace("```", "").strip()
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1:
             text = text[start:end+1]
-        return json.loads(text) 
+        return json.loads(text)
     except Exception as e:
         logger.error(f"Claude error {symbol}: {e}")
         return {"direction": "SKIP", "confidence": 0}
-
 
 async def run_scan(bot: Bot):
     now = datetime.now().strftime("%d/%m %H:%M")

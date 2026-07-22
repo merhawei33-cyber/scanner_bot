@@ -49,8 +49,8 @@ def get_top_gainers() -> list:
                 price      = float(item.get("lastPrice", 0))
             except Exception:
                 continue
-            if change_pct < MIN_GAIN_PCT or volume < MIN_VOLUME_USDT or price <= 0:
-                continue
+           if volume < MIN_VOLUME_USDT or price <= 0:
+    continue
             coins.append({"symbol": symbol, "price": price,
                           "change_pct": round(change_pct, 2), "volume": volume})
         coins.sort(key=lambda x: x["change_pct"], reverse=True)

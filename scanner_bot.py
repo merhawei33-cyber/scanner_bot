@@ -83,7 +83,7 @@ prompt = (
             "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
             '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
         )
-    try:
+try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01",

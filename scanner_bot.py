@@ -82,9 +82,7 @@ prompt = (
             f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
             "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
             '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
-        )
-{{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה במשפט אחד בלי גרשיים"}}"""
-{{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה במשפט אחד בלי גרשיים"}}"""
+   
     try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",

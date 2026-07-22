@@ -77,13 +77,13 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             f"O:{c[1]} H:{c[2]} L:{c[3]} C:{c[4]} V:{c[5]}"
             for c in candles[:15] if len(c) >= 6
         )
-prompt = (
-            f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
-            f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
-            "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
-            '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
-        )
-try:
+    prompt = (
+        f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
+        f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
+        "החזר אך ורק JSON תקני, בלי טקסט נוסף, בלי markdown, בלי גרשיים בתוך reason:\n"
+        '{"direction":"LONG או SHORT או SKIP","confidence":0-100,"entry":מחיר,"sl":מחיר,"tp":מחיר,"reason":"סיבה קצרה בלי גרשיים"}'
+    )
+    try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01",
@@ -95,7 +95,7 @@ try:
         text = resp.json()["content"][0]["text"].strip()
         text = text.replace("```json", "").replace("```", "").strip()
         return json.loads(text)
-       except Exception as e:
+    except Exception as e:
         logger.error(f"Claude error {symbol}: {e}")
         return {"direction": "SKIP", "confidence": 0}
 

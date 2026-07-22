@@ -154,7 +154,7 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def auto_scan_job(context: ContextTypes.DEFAULT_TYPE):
     await run_scan(context.bot)
 
-def main(): 
+def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start",  cmd_start))
     app.add_handler(CommandHandler("scan",   cmd_scan))
@@ -162,6 +162,7 @@ def main():
     app.add_handler(CommandHandler("status", cmd_status))
     app.job_queue.run_repeating(auto_scan_job, interval=SCAN_INTERVAL_SECS, first=60)
     logger.info("🚀 Scanner Bot started!")
-   app.run_polling(drop_pending_updates=True)
+    app.run_polling(drop_pending_updates=True)
+
 if __name__ == "__main__":
     main()

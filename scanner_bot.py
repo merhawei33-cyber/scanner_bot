@@ -36,10 +36,22 @@ def get_top_gainers() -> list:
     try:
         resp = requests.get(
             "https://api.bybit.com/v5/market/tickers",
-            params={"category": "linear"}, timeout=10
+            params={"category": "linear"}, timeout=10,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; DjmereBot/1.0)"}
         )
+        if resp.status_code != 200:
+            logger.error(f"Bybit returned status {resp.status_code}: {resp.text[:500]}")
+            return []
+        try:
+            data = resp.json()
+        except Exception as je:
+            logger.error(f"Bybit non-JSON response ({je}): {resp.text[:500]}")
+            return []
+        if data.get("retCode") != 0:
+            logger.error(f"Bybit API error retCode={data.get('retCode')} retMsg={data.get('retMsg')}")
+            return []
         coins = []
-        for item in resp.json()["result"]["list"]:
+        for item in data["result"]["list"]:
             symbol = item["symbol"]
             if not symbol.endswith("USDT") or symbol in SKIP_SYMBOLS:
                 continue

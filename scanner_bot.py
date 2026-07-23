@@ -115,7 +115,7 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             elif line.upper().startswith("REASON:"):
                 result["reason"] = line.split(":", 1)[1].strip()
         return result
-  
+        except Exception as e:
         logger.error(f"Claude error {symbol}: {e}")
         return {"direction": "SKIP", "confidence": 0}
 

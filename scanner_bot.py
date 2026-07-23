@@ -77,7 +77,7 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             f"O:{c[1]} H:{c[2]} L:{c[3]} C:{c[4]} V:{c[5]}"
             for c in candles[:15] if len(c) >= 6
         )
-  prompt = (
+    prompt = (
         f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
         f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
         "ענה בדיוק בפורמט הזה, שורה לכל שדה, בלי שום דבר נוסף:\n"
@@ -115,7 +115,7 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             elif line.upper().startswith("REASON:"):
                 result["reason"] = line.split(":", 1)[1].strip()
         return result
-        except Exception as e:
+    except Exception as e:
         logger.error(f"Claude error {symbol}: {e}")
         return {"direction": "SKIP", "confidence": 0}
 

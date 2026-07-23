@@ -35,29 +35,26 @@ SCAN_INTERVAL_SECS = 3600
 def get_top_gainers() -> list:
     try:
         resp = requests.get(
-            "https://api.bybit.com/v5/market/tickers",
-            params={"category": "linear"}, timeout=10,
+            "https://fapi.binance.com/fapi/v1/ticker/24hr",
+            timeout=10,
             headers={"User-Agent": "Mozilla/5.0 (compatible; DjmereBot/1.0)"}
         )
         if resp.status_code != 200:
-            logger.error(f"Bybit returned status {resp.status_code}: {resp.text[:500]}")
+            logger.error(f"Binance returned status {resp.status_code}: {resp.text[:500]}")
             return []
         try:
             data = resp.json()
         except Exception as je:
-            logger.error(f"Bybit non-JSON response ({je}): {resp.text[:500]}")
-            return []
-        if data.get("retCode") != 0:
-            logger.error(f"Bybit API error retCode={data.get('retCode')} retMsg={data.get('retMsg')}")
+            logger.error(f"Binance non-JSON response ({je}): {resp.text[:500]}")
             return []
         coins = []
-        for item in data["result"]["list"]:
-            symbol = item["symbol"]
+        for item in data:
+            symbol = item.get("symbol", "")
             if not symbol.endswith("USDT") or symbol in SKIP_SYMBOLS:
                 continue
             try:
-                change_pct = float(item.get("price24hPcnt", 0)) * 100
-                volume     = float(item.get("turnover24h", 0))
+                change_pct = float(item.get("priceChangePercent", 0))
+                volume     = float(item.get("quoteVolume", 0))
                 price      = float(item.get("lastPrice", 0))
             except Exception:
                 continue
@@ -70,15 +67,15 @@ def get_top_gainers() -> list:
     except Exception as e:
         logger.error(f"Error: {e}")
         return []
-def get_candles(symbol: str, interval: str = "60", limit: int = 30) -> list:
+def get_candles(symbol: str, interval: str = "1h", limit: int = 30) -> list:
     try:
         resp = requests.get(
-            "https://api.bybit.com/v5/market/kline",
-            params={"category": "linear", "symbol": symbol,
-                    "interval": interval, "limit": limit},
-            timeout=10
+            "https://fapi.binance.com/fapi/v1/klines",
+            params={"symbol": symbol, "interval": interval, "limit": limit},
+            timeout=10,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; DjmereBot/1.0)"}
         )
-        return resp.json()["result"]["list"]
+        return resp.json()
     except Exception:
         return []
 
@@ -145,7 +142,7 @@ async def run_scan(bot: Bot):
     for coin in gainers:
         symbol = coin["symbol"]
         analysis = analyze_with_claude(symbol, coin["price"], coin["change_pct"],
-                                        get_candles(symbol, "60"), get_candles(symbol, "240"))
+                                        get_candles(symbol, "1h"), get_candles(symbol, "4h"))
         if analysis.get("direction") != "SKIP" and analysis.get("confidence", 0) >= MIN_CONFIDENCE:
             results.append({**coin, **analysis})
         await asyncio.sleep(1)

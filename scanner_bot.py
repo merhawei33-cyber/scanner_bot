@@ -27,8 +27,8 @@ SKIP_SYMBOLS = {
 
 MIN_VOLUME_USDT    = 1_000_000
 MIN_GAIN_PCT       = 8.0
-TOP_N              = 25
-MIN_CONFIDENCE = 70
+TOP_N              = 20
+MIN_CONFIDENCE     = 80
 SCAN_INTERVAL_SECS = 3600
 
 
@@ -91,8 +91,21 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
             for c in candles[:15] if len(c) >= 6
         )
     prompt = (
-        f"אתה טריידר מקצועי. נתח את {symbol} מחיר {price}$ עלייה {change_pct}%\n"
-        f"1H נרות:\n{fmt(candles_1h)}\n4H נרות:\n{fmt(candles_4h)}\n"
+        f"אתה טריידר מקצועי שמנתח פעולת מחיר (Price Action). נתח את {symbol} "
+        f"מחיר נוכחי {price}$ עלייה של {change_pct}% ב-24 שעות האחרונות.\n\n"
+        f"נרות 1H (מהישן לחדש):\n{fmt(candles_1h)}\n\n"
+        f"נרות 4H (מהישן לחדש):\n{fmt(candles_4h)}\n\n"
+        "בצע ניתוח לפי חמשת הקריטריונים הבאים לפני שאתה קובע כיוון:\n"
+        "1. Swing Highs/Lows: זהה שיאים ושפלים משמעותיים בנתונים - אלו אזורי הנזילות.\n"
+        "2. Volume: בדוק אם התנועה האחרונה מלווה בנפח מסחר גבוה/חריג (עמודת V), "
+        "או שהיא על נפח נמוך וחשודה כחלשה.\n"
+        "3. Price Action: קבע אם המחיר עשה Breakout אמיתי מעל/מתחת לרמת מפתח, "
+        "או Reject (דחייה עם פתיל ארוך) בשיא/שפל - אלו מובילים למסקנות הפוכות.\n"
+        "4. ATR/Volatility: העריך את עומק התנודתיות של הנרות האחרונים ביחס לממוצע, "
+        "וסמן אם מדובר ב'רעש' חסר כיוון או ב-Liquidity Sweep אמיתי.\n"
+        "5. Pivot Detection: זהה pivot high/low קרובים שיכולים לשמש כאזורי כניסה/יציאה.\n\n"
+        "חשוב: אם המהלך כבר מוצה (עלייה חדה שכבר האטה, פתילי דחייה בשיא, נפח יורד) "
+        "תן ציון CONFIDENCE נמוך או SKIP, גם אם אחוז העלייה הכללי גבוה.\n\n"
         "ענה בדיוק בפורמט הזה, שורה לכל שדה, בלי שום דבר נוסף:\n"
         "DIRECTION: LONG או SHORT או SKIP\n"
         "CONFIDENCE: מספר בין 0 ל-100\n"

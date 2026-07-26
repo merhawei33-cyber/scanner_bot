@@ -27,7 +27,7 @@ SKIP_SYMBOLS = {
 
 MIN_VOLUME_USDT    = 1_000_000
 MIN_GAIN_PCT       = 8.0
-TOP_N              = 25
+TOP_N              = 20
 MIN_CONFIDENCE     = 70
 SCAN_INTERVAL_SECS = 3600
 

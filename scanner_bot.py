@@ -27,8 +27,8 @@ SKIP_SYMBOLS = {
 
 MIN_VOLUME_USDT    = 1_000_000
 MIN_GAIN_PCT       = 8.0
-TOP_N              = 20
-MIN_CONFIDENCE     = 70
+TOP_N              = 100
+MIN_CONFIDENCE     = 80
 SCAN_INTERVAL_SECS = 3600
 
 
@@ -65,7 +65,7 @@ def get_top_gainers() -> list:
                 continue
             coins.append({"symbol": symbol, "price": price,
                            "change_pct": round(change_pct, 2), "volume": volume})
-        coins.sort(key=lambda x: x["change_pct"], reverse=True)
+        coins.sort(key=lambda x: abs(x["change_pct"]), reverse=True)
         return coins[:TOP_N]
     except Exception as e:
         logger.error(f"Error: {e}")

@@ -9,6 +9,7 @@ import requests
 import json
 import logging
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
@@ -30,6 +31,9 @@ MIN_GAIN_PCT       = 8.0
 TOP_N              = 100
 MIN_CONFIDENCE     = 70
 SCAN_INTERVAL_SECS = 3600
+ISRAEL_TZ           = ZoneInfo("Asia/Jerusalem")
+AUTO_SCAN_START_HOUR = 10   # auto-scans run starting 10:00 Israel time
+AUTO_SCAN_END_HOUR   = 22   # auto-scans stop at 22:00 Israel time (manual /scan always works)
 
 
 def get_top_gainers() -> list:
@@ -198,6 +202,10 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"✅ פעיל | {datetime.now().strftime('%d/%m %H:%M')} | סריקה כל שעה | {MIN_CONFIDENCE}% מינימום", parse_mode="Markdown")
 
 async def auto_scan_job(context: ContextTypes.DEFAULT_TYPE):
+    now_il = datetime.now(ISRAEL_TZ)
+    if not (AUTO_SCAN_START_HOUR <= now_il.hour < AUTO_SCAN_END_HOUR):
+        logger.info(f"Skipping auto-scan (outside active hours) — {now_il.strftime('%H:%M')} IL time")
+        return
     await run_scan(context.bot)
 
 def main():

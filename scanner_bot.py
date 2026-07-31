@@ -29,7 +29,7 @@ SKIP_SYMBOLS = {
 MIN_VOLUME_USDT    = 1_000_000
 MIN_GAIN_PCT       = 8.0
 TOP_N              = 10
-MIN_CONFIDENCE     = 60
+MIN_CONFIDENCE     = 70
 SCAN_INTERVAL_SECS = 3600
 ISRAEL_TZ           = ZoneInfo("Asia/Jerusalem")
 AUTO_SCAN_START_HOUR = 10   # auto-scans run starting 10:00 Israel time
@@ -108,8 +108,13 @@ def analyze_with_claude(symbol, price, change_pct, candles_1h, candles_4h) -> di
         "4. ATR/Volatility: העריך את עומק התנודתיות של הנרות האחרונים ביחס לממוצע, "
         "וסמן אם מדובר ב'רעש' חסר כיוון או ב-Liquidity Sweep אמיתי.\n"
         "5. Pivot Detection: זהה pivot high/low קרובים שיכולים לשמש כאזורי כניסה/יציאה.\n\n"
-        "חשוב: אם המהלך כבר מוצה (עלייה חדה שכבר האטה, פתילי דחייה בשיא, נפח יורד) "
-        "תן ציון CONFIDENCE נמוך או SKIP, גם אם אחוז העלייה הכללי גבוה.\n\n"
+        "חשוב: בדוק מיצוי לשני הכיוונים באותה רמת קפדנות:\n"
+        "- אם מדובר בעלייה חדה שכבר האטה, עם פתילי דחייה בשיא ונפח יורד - "
+        "זה מחליש LONG וכיוון להיות SHORT.\n"
+        "- אם מדובר בירידה חדה שכבר האטה, עם פתילי דחייה בשפל ונפח יורד - "
+        "זה מחליש SHORT וכיוון להיות LONG.\n"
+        "אל תניח כברירת מחדל שתנועה חדה = SHORT. בחן את שני הכיוונים באופן שווה "
+        "לפני קביעת מסקנה, ותן CONFIDENCE נמוך או SKIP אם התמונה לא ברורה.\n\n"
         "ענה בדיוק בפורמט הזה, שורה לכל שדה, בלי שום דבר נוסף:\n"
         "DIRECTION: LONG או SHORT או SKIP\n"
         "CONFIDENCE: מספר בין 0 ל-100\n"

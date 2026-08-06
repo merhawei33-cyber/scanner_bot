@@ -46,7 +46,7 @@ SKIP_SYMBOLS = {
 
 MIN_VOLUME_USDT    = 1_000_000
 MIN_GAIN_PCT       = 8.0
-TOP_N              = 100
+TOP_N              = 5
 MIN_CONFIDENCE     = 60
 SCAN_INTERVAL_SECS = 3600
 ISRAEL_TZ           = ZoneInfo("Asia/Jerusalem")
